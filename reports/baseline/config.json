@@ -1,0 +1,36 @@
+{
+  "datasets": [
+    "mixture",
+    "moons",
+    "checkerboard"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "ks": [
+    10,
+    100,
+    1000
+  ],
+  "epochs": 100,
+  "batch_size": 256,
+  "n_train": 10000,
+  "n_val": 2000,
+  "n_test": 2000,
+  "latent_dim": 2,
+  "flow_layers": 6,
+  "hidden_dim": 64,
+  "samples": 2000,
+  "grid_size": 80,
+  "plot_k": 100,
+  "plot_seed": 12345,
+  "threads": 1,
+  "lr": 0.001,
+  "observation_variance": 0.01,
+  "device": "cpu",
+  "output": "benchmark_results/baseline"
+}

@@ -16,13 +16,15 @@ def vae_negative_elbo(model, data, batch_size=256):
 
 @torch.no_grad()
 def vae_log_prob(model, data, num_samples=100, batch_size=128):
+    if num_samples < 1 or batch_size < 1 or len(data) == 0:
+        raise ValueError("Importance samples, batch size and data length must be positive")
     model.eval()
     device = next(model.parameters()).device
     log_probabilities = []
     for batch in data.split(batch_size):
         batch = batch.to(device)
         mean, log_variance = model.encode(batch)
-        noise = torch.randn(num_samples, len(batch), 2, device=device, dtype=mean.dtype)
+        noise = torch.randn(num_samples, len(batch), mean.shape[-1], device=device, dtype=mean.dtype)
         latent = mean + (0.5 * log_variance).exp() * noise
         reconstruction_mean = model.decode(latent)
         log_likelihood = -model.reconstruction_nll(batch, reconstruction_mean)
@@ -64,3 +66,4 @@ def print_results(results):
     print("Importance sampling estimates VAE likelihood; it does not make it exact.")
     print("RealNVP likelihood is exact under its model, not necessarily the true density.")
     print("Both models use the same Gaussian mixture training and test data.")
+

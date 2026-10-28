@@ -5,15 +5,15 @@ from torch import nn
 
 
 class AffineCoupling(nn.Module):
-    def __init__(self, mask):
+    def __init__(self, mask, hidden_dim=64):
         super().__init__()
         self.register_buffer("mask", torch.tensor(mask, dtype=torch.float32))
         self.network = nn.Sequential(
-            nn.Linear(2, 64),
+            nn.Linear(2, hidden_dim),
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(64, 4),
+            nn.Linear(hidden_dim, 4),
         )
         nn.init.zeros_(self.network[-1].weight)
         nn.init.zeros_(self.network[-1].bias)
@@ -36,11 +36,13 @@ class AffineCoupling(nn.Module):
 
 
 class RealNVP(nn.Module):
-    def __init__(self):
+    def __init__(self, num_layers=6, hidden_dim=64):
         super().__init__()
+        if num_layers < 1 or hidden_dim < 1:
+            raise ValueError("Layer count and hidden dimension must be positive")
         self.layers = nn.ModuleList([
-            AffineCoupling([index % 2, 1 - index % 2])
-            for index in range(6)
+            AffineCoupling([index % 2, 1 - index % 2], hidden_dim)
+            for index in range(num_layers)
         ])
 
     def forward(self, data):
@@ -70,3 +72,4 @@ class RealNVP(nn.Module):
         mask = self.layers[0].mask
         latent = torch.randn(num_samples, 2, device=mask.device, dtype=mask.dtype)
         return self.inverse(latent)
+
