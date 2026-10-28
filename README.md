@@ -2,6 +2,10 @@
 
 A small PyTorch experiment for learning how a VAE and a RealNVP flow model the same eight-mode, two-dimensional distribution. Both models train from scratch. The only third-party dependencies are PyTorch, NumPy, and Matplotlib.
 
+## Multi-seed benchmark
+
+A separate `benchmark.py` runner adds three datasets, independent validation data, five seeds, K-sensitivity checks, configurable architectures, checkpoints, and measured summaries. See [BENCHMARK.md](BENCHMARK.md) for commands, fairness caveats, and ablations, and the [measured five-seed report](reports/baseline/README.md) for results. Run `python -m unittest -v test_correctness` for mathematical checks. The original demo and historical results below are retained unchanged.
+
 ## Run locally
 
 Use Python 3.10 or newer:
@@ -47,7 +51,7 @@ normalizing-flows-vs-vae/
 └── README.md
 ```
 
-Start with `data.py`, then the two models, `train.py`, `evaluate.py`, `plot_results.py`, and finally `main.py`. Explanations live here so the Python files contain no comments or docstrings. The four experiment output files are PNGs in `results/`.
+Start with `data.py`, then the two models, `train.py`, `evaluate.py`, `plot_results.py`, and finally `main.py`. The original demonstration is explained below; the benchmark includes short implementation docstrings. The four experiment output files are PNGs in `results/`.
 
 ## Dataset and training
 
@@ -156,3 +160,4 @@ Test curves are provided for understanding this predetermined run. If you later 
 - [Kingma and Welling: Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114)
 - [Dinh, Sohl-Dickstein, and Bengio: Density estimation using Real NVP](https://arxiv.org/abs/1605.08803)
 - [Burda, Grosse, and Salakhutdinov: Importance Weighted Autoencoders](https://arxiv.org/abs/1509.00519) — background for the evaluation estimator; this project trains the VAE with the ordinary ELBO.
+

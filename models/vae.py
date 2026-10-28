@@ -9,23 +9,26 @@ def kl_divergence(mean, log_variance):
 
 
 class VAE(nn.Module):
-    def __init__(self):
+    def __init__(self, latent_dim=2, hidden_dim=64, observation_variance=0.01):
         super().__init__()
-        self.observation_variance = 0.01
+        if latent_dim < 1 or hidden_dim < 1 or observation_variance <= 0:
+            raise ValueError("Model dimensions and observation variance must be positive")
+        self.latent_dim = latent_dim
+        self.observation_variance = observation_variance
         self.encoder = nn.Sequential(
-            nn.Linear(2, 64),
+            nn.Linear(2, hidden_dim),
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
         )
-        self.mean_layer = nn.Linear(64, 2)
-        self.log_variance_layer = nn.Linear(64, 2)
+        self.mean_layer = nn.Linear(hidden_dim, latent_dim)
+        self.log_variance_layer = nn.Linear(hidden_dim, latent_dim)
         self.decoder = nn.Sequential(
-            nn.Linear(2, 64),
+            nn.Linear(latent_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(64, 2),
+            nn.Linear(hidden_dim, 2),
         )
 
     def encode(self, data):
@@ -58,6 +61,7 @@ class VAE(nn.Module):
     @torch.no_grad()
     def sample(self, num_samples):
         weight = self.mean_layer.weight
-        latent = torch.randn(num_samples, 2, device=weight.device, dtype=weight.dtype)
+        latent = torch.randn(num_samples, self.latent_dim, device=weight.device, dtype=weight.dtype)
         mean = self.decode(latent)
         return mean + math.sqrt(self.observation_variance) * torch.randn_like(mean)
+
